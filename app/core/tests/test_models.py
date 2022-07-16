@@ -3,7 +3,7 @@
 from decimal import Decimal
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-
+from unittest.mock import patch
 from core import models
 
 def create_user(email='test@example.com',password='testpass',):
@@ -77,3 +77,23 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(tag), tag.name)
+
+    def test_create_ingredient(self):
+        """ Test creating a new ingredient """
+        user = create_user()
+        ingredient = models.Ingredient.objects.create(
+            name="Topocho",
+            user=user,
+        )
+
+        self.assertEqual(str(ingredient), ingredient.name)
+
+    @patch('core.models.uuid.uuid4')
+    def test_recipe_filename_uuid(self, mock_uuid):
+        """ Test generating image path """
+        uuid = 'test-uuid'
+        mock_uuid.return_value = uuid
+        expected_path = models.recipe_image_file_path(None, 'myimage.jpg')
+
+
+        self.assertEqual(f'uploads/recipe/{uuid}.jpg', expected_path)
