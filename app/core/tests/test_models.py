@@ -1,15 +1,21 @@
 """ Test for models."""
 
 from decimal import Decimal
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from unittest.mock import patch
+
 from core import models
 
-def create_user(email='test@example.com',password='testpass',):
+
+def create_user(
+    email="test@example.com", password="testpass",
+):
     """ Create a user. """
 
-    return get_user_model().objects.create_user(email,password,)
+    return get_user_model().objects.create_user(email, password,)
+
 
 class ModelTests(TestCase):
     def test_create_user_with_email_successful(self):
@@ -54,15 +60,14 @@ class ModelTests(TestCase):
     def test_create_recipe(self):
         """ Test creating a new recipe """
         user = get_user_model().objects.create_user(
-            "test@example.com",
-            "test123",
+            "test@example.com", "test123",
         )
 
         recipe = models.Recipe.objects.create(
             title="Test recipe",
             time_minutes=5,
             user=user,
-            price=Decimal('5.00'),
+            price=Decimal("5.00"),
             description="A test recipe",
         )
 
@@ -71,10 +76,7 @@ class ModelTests(TestCase):
     def test_create_tag(self):
         """ Test creating a new tag """
         user = create_user()
-        tag = models.Tag.objects.create(
-            name="Test tag",
-            user=user,
-        )
+        tag = models.Tag.objects.create(name="Test tag", user=user,)
 
         self.assertEqual(str(tag), tag.name)
 
@@ -82,18 +84,16 @@ class ModelTests(TestCase):
         """ Test creating a new ingredient """
         user = create_user()
         ingredient = models.Ingredient.objects.create(
-            name="Topocho",
-            user=user,
+            name="Topocho", user=user,
         )
 
         self.assertEqual(str(ingredient), ingredient.name)
 
-    @patch('core.models.uuid.uuid4')
+    @patch("core.models.uuid.uuid4")
     def test_recipe_filename_uuid(self, mock_uuid):
         """ Test generating image path """
-        uuid = 'test-uuid'
+        uuid = "test-uuid"
         mock_uuid.return_value = uuid
-        expected_path = models.recipe_image_file_path(None, 'myimage.jpg')
+        expected_path = models.recipe_image_file_path(None, "myimage.jpg")
 
-
-        self.assertEqual(f'uploads/recipe/{uuid}.jpg', expected_path)
+        self.assertEqual(f"uploads/recipe/{uuid}.jpg", expected_path)
